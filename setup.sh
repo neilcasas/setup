@@ -5,7 +5,7 @@ echo "Welcome to your install script."
 echo "Include GUI prerequisites such as flatpak, ttfs? (Y/N)"
 read isgui
 
-echo "Include GUI development apps such as VSCode, Figma etc.? (Y/N)"
+echo "Include GUI development apps such as VSCode? (Y/N)"
 read isdev
 
 # Update system
@@ -71,11 +71,44 @@ if [[ "$isgui" == "Y" ]] || [[ "$isgui" == "y" ]]; then
 	# Installing gdebi
 	echo "Installing gdebi..."
 	sudo apt install gdebi -y
-	if [$? -ne 0 ]; then
+	if [ $? -ne 0 ]; then
 		echo "Failed to install gdebi"
 		exit 1
 	fi
 	echo "Finished installing gdebi"
+
+ 	# Installing VLC media player
+  	echo "Installing VLC media player"
+   	sudo apt install vlc -y
+    
+    	if [ $? -ne 0 ]; then
+     		echo "Failed to install VLC Media player"
+       		exit 1
+	fi
+	
+ 	# Installing Brave Browser
+  	echo "Installing Brave Browser"
+   	sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+
+ 	if [ $? -ne 0 ]; then
+  		echo "Failed to add Brave Browser repo"
+    		exit 1
+      	fi
+	echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+
+	sudo apt update
+ 
+ 	if [ $? -ne 0 ]; then
+  		echo "Failed to download Brave Browser"
+    		exit 1
+      	fi
+
+	sudo apt install brave-browser -y
+ 
+ 	if [ $? -ne 0 ]; then
+  		echo "Failed to download Brave Browser"
+    		exit 1
+      	fi
 
 fi
 
@@ -163,13 +196,5 @@ if [[ "$isdev" == "Y" ]] || [[ "$isdev" == "y" ]]; then
 	sudo apt install apt-transport-https
 	sudo apt update -y
 	sudo apt install code -y # or code-insiders
-
-	# Installing Figma for Linux using snap
-	echo "Installing Figma for Linux..."
-	sudo snap install figma-linux --classic
-	if [ $? -ne 0 ]; then
-		echo "Failed to install Figma."
-	fi
-	echo "Successfully installed Figma."
 
 fi
